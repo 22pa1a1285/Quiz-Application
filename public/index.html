@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Application</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f2f5;
+    }
+    .container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #1677ff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+    button:hover {
+      background-color: #4096ff;
+    }
+    .error {
+      color: red;
+      margin-top: 1rem;
+    }
+    .toggle-form {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .toggle-form a {
+      color: #1677ff;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .toggle-form a:hover {
+      text-decoration: underline;
+    }
+    .form-container {
+      display: none;
+    }
+    .form-container.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Login Form -->
+    <div id="loginFormContainer" class="form-container active">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="loginRole">Role</label>
+          <select id="loginRole" name="role" required>
+            <option value="">Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="employee">Employee</option>
+          </select>
+        </div>
+        <div class="form-group" id="loginEmailGroup">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" name="email" required />
+        </div>
+        <div class="form-group" id="loginEmpIdGroup" style="display: none;">
+          <label for="loginEmpId">Employee ID</label>
+          <input type="text" id="loginEmpId" name="empId" />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" name="password" required />
+        </div>
+        <button type="submit">Login</button>
+      </form>
+      <div class="toggle-form">
+        Don't have an account? <a onclick="toggleForms()">Sign up</a>
+      </div>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="signupFormContainer" class="form-container">
+      <h2>Sign Up</h2>
+      <form id="signupForm">
+        <div class="form-group">
+          <label for="signupUsername">Username</label>
+          <input type="text" id="signupUsername" name="username" required />
+        </div>
+        <div class="form-group">
+          <label for="signupRole">Role</label>
+          <select id="signupRole" name="role" required>
+            <option value="">Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="employee">Employee</option>
+          </select>
+        </div>
+        <div class="form-group" id="signupEmailGroup">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" name="email" required />
+        </div>
+        <div class="form-group" id="signupEmpIdGroup" style="display: none;">
+          <label for="signupEmpId">Employee ID</label>
+          <input type="text" id="signupEmpId" name="empId" />
+        </div>
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" name="password" required />
+        </div>
+        <button type="submit">Sign Up</button>
+      </form>
+      <div class="toggle-form">
+        Already have an account? <a onclick="toggleForms()">Login</a>
+      </div>
+    </div>
+    <div id="error" class="error"></div>
+  </div>
+
+  <script>
+    // Form toggle logic
+    function toggleForms() {
+      document.getElementById('loginFormContainer').classList.toggle('active');
+      document.getElementById('signupFormContainer').classList.toggle('active');
+      document.getElementById('error').textContent = '';
+    }
+
+    // Form role selectors
+    const loginRoleSelect = document.getElementById('loginRole');
+    const loginEmailGroup = document.getElementById('loginEmailGroup');
+    const loginEmpIdGroup = document.getElementById('loginEmpIdGroup');
+    const loginForm = document.getElementById('loginForm');
+    const errorDiv = document.getElementById('error');
+
+    const signupRoleSelect = document.getElementById('signupRole');
+    const signupEmailGroup = document.getElementById('signupEmailGroup');
+    const signupEmpIdGroup = document.getElementById('signupEmpIdGroup');
+    const signupForm = document.getElementById('signupForm');
+
+    // Role-based input display
+    loginRoleSelect.addEventListener('change', () => {
+      if (loginRoleSelect.value === 'employee') {
+        loginEmpIdGroup.style.display = 'block';
+        document.getElementById('loginEmpId').required = true;
+      } else {
+        loginEmpIdGroup.style.display = 'none';
+        document.getElementById('loginEmpId').required = false;
+      }
+    });
+
+    signupRoleSelect.addEventListener('change', () => {
+      if (signupRoleSelect.value === 'employee') {
+        signupEmpIdGroup.style.display = 'block';
+        document.getElementById('signupEmpId').required = true;
+      } else {
+        signupEmpIdGroup.style.display = 'none';
+        document.getElementById('signupEmpId').required = false;
+      }
+    });
+
+    // Add this function at the start of the script section
+     function getAuthHeaders() {
+      const token = localStorage.getItem('token');
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      };
+    }
+   
+
+    // Update the login fetch request
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorDiv.textContent = '';
+
+      const formData = {
+        role: loginRoleSelect.value,
+        email: document.getElementById('loginEmail').value,
+        empId: document.getElementById('loginEmpId').value,
+        password: document.getElementById('loginPassword').value
+      };
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+
+          if (formData.role === 'admin') {
+            window.location.href = '/admin/dashboard';
+          } else {
+            window.location.href = '/employee/dashboard';
+          }
+        } else {
+          errorDiv.textContent = data.message || 'Login failed. Please try again.';
+        }
+      } catch (err) {
+        console.error(err);
+        errorDiv.textContent = 'Server error. Try again.';
+      }
+    });
+
+    // Update the signup fetch request
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorDiv.textContent = '';
+
+      const formData = {
+        username: document.getElementById('signupUsername').value,
+        role: signupRoleSelect.value,
+        email: document.getElementById('signupEmail').value,
+        empId: document.getElementById('signupEmpId').value,
+        password: document.getElementById('signupPassword').value
+      };
+
+      try {
+        const response = await fetch('/api/signup', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          errorDiv.textContent = 'Signup successful! Please login.';
+          signupForm.reset();
+          toggleForms();
+        } else {
+          errorDiv.textContent = data.message || 'Signup failed. Please try again.';
+        }
+      } catch (err) {
+        console.error(err);
+        errorDiv.textContent = 'Server error. Try again.';
+      }
+    });
+
+    // Auto-redirect if already logged in
+    window.addEventListener('load', () => {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+      if (token && user.role) {
+        if (user.role === 'admin') {
+          window.location.href = '/admin/dashboard';
+        } else if (user.role === 'employee') {
+          window.location.href = '/employee/dashboard';
+        }
+      }
+    });
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/';
+    }
+
+    // Add logout button on protected pages
+    if (window.location.pathname.includes('/admin') || window.location.pathname.includes('/employee')) {
+      const logoutButton = document.createElement('button');
+      logoutButton.textContent = 'Logout';
+      logoutButton.onclick = logout;
+      logoutButton.style.position = 'absolute';
+      logoutButton.style.top = '10px';
+      logoutButton.style.right = '10px';
+      document.body.appendChild(logoutButton);
+    }
+  </script>
+</body>
+</html>

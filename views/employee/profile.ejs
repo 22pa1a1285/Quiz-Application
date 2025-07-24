@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile</title>
+  <style>
+    body {
+      background: linear-gradient(120deg, #f5f7fa 0%, #e9e4f0 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 500px;
+      margin: 48px auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(107,70,193,0.10);
+      padding: 36px 28px 32px 28px;
+    }
+    h1 {
+      text-align: center;
+      color: #6b46c1;
+      margin-bottom: 32px;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 24px;
+      background: linear-gradient(90deg, #6b46c1 60%, #805ad5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-size: 1.08rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(107,70,193,0.08);
+      transition: background 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+    .back-btn:hover {
+      background: linear-gradient(90deg, #805ad5 60%, #6b46c1 100%);
+      box-shadow: 0 4px 16px rgba(107,70,193,0.16);
+      color: #fff;
+      text-decoration: none;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    label {
+      color: #6b46c1;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    input[type="password"] {
+      padding: 10px 12px;
+      border: 1.5px solid #c7d2fe;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      background: #f8fafc;
+      margin-bottom: 2px;
+      transition: border-color 0.2s;
+    }
+    input[type="password"]:focus {
+      border-color: #6366f1;
+      outline: none;
+      box-shadow: 0 0 0 2px #a5b4fc;
+    }
+    button[type="submit"] {
+      background: linear-gradient(90deg, #6366f1 60%, #818cf8 100%);
+      color: #fff;
+      border: none;
+      padding: 13px 32px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #c7d2fe;
+      transition: background 0.2s;
+    }
+    button[type="submit"]:hover {
+      background: linear-gradient(90deg, #4338ca 60%, #6366f1 100%);
+    }
+    .msg {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 1.08rem;
+      font-weight: 600;
+    }
+    .msg.success { color: #10b981; }
+    .msg.error { color: #ef4444; }
+    @media (max-width: 600px) {
+      .container { padding: 10px 2vw; }
+      h1 { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/employee/dashboard" class="back-btn">&larr; Back to Dashboard</a>
+    <h1>My Profile</h1>
+    <form id="changePasswordForm">
+      <div>
+        <label for="oldPassword">Old Password</label>
+        <input type="password" id="oldPassword" name="oldPassword" required>
+      </div>
+      <div>
+        <label for="newPassword">New Password</label>
+        <input type="password" id="newPassword" name="newPassword" required minlength="8">
+      </div>
+      <div>
+        <label for="confirmPassword">Confirm New Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8">
+      </div>
+      <button type="submit">Change Password</button>
+    </form>
+    <div id="msg" class="msg" style="display:none;"></div>
+  </div>
+  <script>
+    document.getElementById('changePasswordForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const oldPassword = document.getElementById('oldPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const msgDiv = document.getElementById('msg');
+      msgDiv.style.display = 'none';
+      msgDiv.className = 'msg';
+      if (newPassword !== confirmPassword) {
+        msgDiv.textContent = 'New passwords do not match.';
+        msgDiv.classList.add('error');
+        msgDiv.style.display = 'block';
+        return;
+      }
+      try {
+        const res = await fetch('/api/quizzes/change-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          },
+          body: JSON.stringify({ oldPassword, newPassword })
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          msgDiv.textContent = 'Password changed successfully!';
+          msgDiv.classList.add('success');
+        } else {
+          msgDiv.textContent = result.message || 'Failed to change password.';
+          msgDiv.classList.add('error');
+        }
+        msgDiv.style.display = 'block';
+      } catch (err) {
+        msgDiv.textContent = 'Error changing password.';
+        msgDiv.classList.add('error');
+        msgDiv.style.display = 'block';
+      }
+    };
+  </script>
+</body>
+</html> 

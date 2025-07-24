@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Quizzes - Employee</title>
+  <style>
+    body {
+      background: linear-gradient(120deg, #f5f7fa 0%, #e9e4f0 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #6b46c1;
+      margin-bottom: 30px;
+      letter-spacing: 1px;
+    }
+    .quiz-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+    }
+    .quiz-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(107,70,193,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+      padding: 28px 24px 20px 24px;
+      width: 320px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .quiz-card:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 8px 32px rgba(107,70,193,0.16), 0 3px 12px rgba(0,0,0,0.08);
+    }
+    .quiz-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    .quiz-meta {
+      font-size: 0.98rem;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+    .badge-easy { background: #d1fae5; color: #10b981; }
+    .badge-medium { background: #fef3c7; color: #f59e0b; }
+    .badge-hard { background: #fee2e2; color: #ef4444; }
+    .attempt-btn {
+      margin-top: auto;
+      background: linear-gradient(90deg, #6b46c1 60%, #805ad5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(107,70,193,0.08);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .attempt-btn:hover {
+      background: linear-gradient(90deg, #805ad5 60%, #6b46c1 100%);
+      box-shadow: 0 4px 16px rgba(107,70,193,0.16);
+    }
+    .quiz-card {
+      transition: box-shadow 0.18s, transform 0.18s;
+    }
+    .quiz-card:hover {
+      box-shadow: 0 6px 18px rgba(107,70,193,0.18);
+      transform: translateY(-4px) scale(1.03);
+    }
+    .attempt-btn {
+      display: block;
+      width: 100%;
+      background: linear-gradient(90deg, #6b46c1 60%, #805ad5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 0;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(107,70,193,0.08);
+      transition: background 0.2s, box-shadow 0.2s;
+      text-align: center;
+      text-decoration: none;
+      margin-top: 10px;
+    }
+    .attempt-btn:hover {
+      background: linear-gradient(90deg, #805ad5 60%, #6b46c1 100%);
+      box-shadow: 0 4px 16px rgba(107,70,193,0.16);
+      color: #fff;
+      text-decoration: none;
+    }
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.2s;
+      width: 100vw;
+      height: 100vh;
+    }
+    .modal.hidden { display: none; }
+    .modal-content {
+      background: #fff;
+      border-radius: 18px;
+      padding: 40px 32px 32px 32px;
+      min-width: 340px;
+      max-width: 700px;
+      width: 90vw;
+      box-shadow: 0 12px 48px rgba(107,70,193,0.18);
+      position: relative;
+      animation: popIn 0.25s cubic-bezier(.4,2,.6,1) 1;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @media (max-width: 800px) {
+      .modal-content { max-width: 99vw; padding: 18px 4vw 18px 4vw; }
+    }
+    .close-btn {
+      position: absolute;
+      top: 16px; right: 18px;
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: #6b7280;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .close-btn:hover { color: #ef4444; }
+    #timer {
+      position: absolute;
+      top: 18px;
+      right: 60px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #6b46c1;
+      background: #f3f4f6;
+      padding: 6px 18px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(107,70,193,0.08);
+    }
+    .quiz-question {
+      margin-bottom: 18px;
+      font-size: 1.08rem;
+      color: #1f2937;
+      font-weight: 500;
+    }
+    .quiz-options label {
+      display: block;
+      margin-bottom: 10px;
+      background: #f3f4f6;
+      border-radius: 7px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    .quiz-options input[type="radio"] {
+      margin-right: 10px;
+    }
+    .quiz-options label:hover {
+      background: #ede9fe;
+    }
+    .submit-btn {
+      background: #6b46c1;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 18px;
+      transition: background 0.2s;
+    }
+    .submit-btn:hover {
+      background: #805ad5;
+    }
+    .marks-section {
+      text-align: center;
+      margin-top: 30px;
+      background: #f3f4f6;
+      border-radius: 12px;
+      padding: 24px 0;
+      font-size: 1.2rem;
+      color: #10b981;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(16,185,129,0.08);
+      animation: popIn 0.3s cubic-bezier(.4,2,.6,1) 1;
+    }
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 24px;
+      background: linear-gradient(90deg, #6b46c1 60%, #805ad5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-size: 1.08rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(107,70,193,0.08);
+      transition: background 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+    .back-btn:hover {
+      background: linear-gradient(90deg, #805ad5 60%, #6b46c1 100%);
+      box-shadow: 0 4px 16px rgba(107,70,193,0.16);
+      color: #fff;
+      text-decoration: none;
+    }
+    @media (max-width: 700px) {
+      .quiz-list { flex-direction: column; align-items: center; }
+      .quiz-card { width: 95vw; }
+      .container { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/employee/dashboard" class="back-btn">&larr; Back to Dashboard</a>
+    <h1>Available Quizzes</h1>
+    <div class="quiz-list" id="quizList">
+      <!-- Quiz cards will be injected here -->
+    </div>
+    <div class="marks-section" id="marksSection" style="display:none;"></div>
+  </div>
+
+  <script>
+    let quizzes = [];
+    let currentQuiz = null;
+    let currentQuizQuestions = [];
+    let marks = 0;
+    let timerInterval = null;
+    let timeLeft = 0;
+
+    // Fetch quizzes from API
+    async function fetchQuizzes() {
+      try {
+        const res = await fetch('/api/quizzes/available', {
+          headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+        if (!res.ok) throw new Error('Failed to fetch quizzes');
+        const result = await res.json();
+        console.log(result);
+        quizzes = result.data || [];
+        console.log(quizzes);
+        renderQuizList();
+      } catch (err) {
+        document.getElementById('quizList').innerHTML = '<p style="color:red;">Could not load quizzes.</p>';
+      }
+    }
+
+    
+    function renderQuizList() {
+      const quizList = document.getElementById('quizList');
+      quizList.innerHTML = '';
+      if (!quizzes.length) {
+        quizList.innerHTML = '<p>No quizzes available at the moment.</p>';
+        return;
+      }
+      quizzes.forEach(quiz => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.innerHTML = `
+          <div class="quiz-title">${quiz.title}</div>
+          <div class="quiz-meta">
+            <span class="badge badge-${quiz.difficulty.toLowerCase()}">${quiz.difficulty}</span>
+            <span>${quiz.category}</span>
+          </div>
+          <div class="quiz-meta">Duration: ${quiz.duration} min</div>
+          <a href="/employee/attempt/${quiz.id}" class="attempt-btn">Attempt Quiz</a>
+        `;
+        quizList.appendChild(card);
+      });
+    }
+
+    // Open modal to attempt quiz
+    async function openQuizModal(quizId) {
+      currentQuiz = quizzes.find(q => q.id == quizId);
+      if (!currentQuiz) return;
+      // Fetch questions for this quiz (if not already included)
+      let questions = currentQuiz.questions;
+      if (!questions) {
+        // Fetch from API
+        try {
+          const res = await fetch(`/api/quizzes/${quizId}/questions`, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+          });
+          if (!res.ok) throw new Error('Failed to fetch questions');
+          questions = await res.json();
+        } catch (err) {
+          alert('Could not load quiz questions.');
+          return;
+        }
+      }
+      currentQuizQuestions = questions;
+      renderQuizQuestions();
+      document.getElementById('quizModal').classList.remove('hidden');
+      // Start timer
+      startTimer(currentQuiz.duration * 60); // duration is in minutes
+    }
+
+    function closeQuizModal() {
+      document.getElementById('quizModal').classList.add('hidden');
+      document.getElementById('quizForm').reset();
+      clearInterval(timerInterval);
+      document.getElementById('timer').textContent = '';
+    }
+
+    function closeResultsModal() {
+      document.getElementById('resultsModal').classList.add('hidden');
+    }
+
+    // Render questions in modal
+    function renderQuizQuestions() {
+      const questionsDiv = document.getElementById('quizQuestions');
+      questionsDiv.innerHTML = '';
+      currentQuizQuestions.forEach((q, idx) => {
+        const options = q.options.map((opt, i) =>
+          `<label><input type="radio" name="q${idx}" value="${i}" required> ${opt}</label>`
+        ).join('');
+        questionsDiv.innerHTML += `
+          <div class="quiz-question">${idx + 1}. ${q.question}</div>
+          <div class="quiz-options">${options}</div>
+        `;
+      });
+    }
+
+    function startTimer(seconds) {
+      timeLeft = seconds;
+      updateTimerDisplay();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          autoSubmitQuiz();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const min = Math.floor(timeLeft / 60);
+      const sec = timeLeft % 60;
+      document.getElementById('timer').textContent = `Time Left: ${min}:${sec.toString().padStart(2, '0')}`;
+    }
+
+    function autoSubmitQuiz() {
+      // Auto-submit the quiz when time is up
+      if (!document.getElementById('quizModal').classList.contains('hidden')) {
+        document.getElementById('quizForm').requestSubmit();
+      }
+    }
+
+    // Handle quiz submission
+    document.getElementById('quizForm').onsubmit = async function(e) {
+      e.preventDefault();
+      clearInterval(timerInterval);
+      let score = 0;
+      const form = e.target;
+      let results = [];
+      currentQuizQuestions.forEach((q, idx) => {
+        const selected = form[`q${idx}`] ? form[`q${idx}`].value : null;
+        const correct = parseInt(selected) === q.correctAnswer;
+        if (correct) score++;
+        results.push({
+          question: q.question,
+          selected: selected !== null ? q.options[selected] : null,
+          correctAnswer: q.options[q.correctAnswer],
+          explanation: q.explanation || '',
+          isCorrect: correct
+        });
+      });
+      marks = score;
+      closeQuizModal();
+      showResults(results, score, currentQuizQuestions.length);
+      // Optionally, send submission to backend
+      try {
+        await fetch(`/api/quizzes/${currentQuiz.id}/submit`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          },
+          body: JSON.stringify({ score, total: currentQuizQuestions.length, results })
+        });
+      } catch (err) {}
+    };
+
+    function showResults(results, score, total) {
+      const resultsModal = document.getElementById('resultsModal');
+      const resultsContent = document.getElementById('resultsContent');
+      resultsContent.innerHTML = `<div style='text-align:center;font-size:1.2rem;margin-bottom:18px;'>You scored <span style="color:#6b46c1;">${score}</span> out of <span style="color:#6b46c1;">${total}</span>!</div>`;
+      results.forEach((r, idx) => {
+        resultsContent.innerHTML += `
+          <div style="margin-bottom:18px;padding:14px 12px;border-radius:8px;background:${r.isCorrect ? '#d1fae5' : '#fee2e2'};">
+            <div style="font-weight:600;">${idx + 1}. ${r.question}</div>
+            <div>Your answer: <b>${r.selected !== null ? r.selected : '<i>Not answered</i>'}</b></div>
+            <div>Correct answer: <b>${r.correctAnswer}</b></div>
+            <div style="color:#6b7280;">Explanation: ${r.explanation || 'No explanation provided.'}</div>
+          </div>
+        `;
+      });
+      resultsModal.classList.remove('hidden');
+    }
+
+    // Initial fetch
+    fetchQuizzes();
+  </script>
+</body>
+</html> 

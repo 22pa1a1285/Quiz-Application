@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - QuizPlatform</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f5f7fa;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100%;
+      background-color: #ffffff;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      transition: left 0.3s ease-in-out;
+    }
+
+    .sidebar-hidden {
+      left: -250px;
+    }
+
+    .sidebar .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .sidebar .logo img {
+      width: 30px;
+      height: 30px;
+    }
+
+    .sidebar .logo h1 {
+      font-size: 20px;
+      font-weight: bold;
+      color: #1f2937;
+    }
+
+    .sidebar nav {
+      padding: 20px;
+    }
+
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      color: #4b5563;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-bottom: 5px;
+    }
+
+    .sidebar nav a.active {
+      background-color: #f3e8ff;
+      color: #6b46c1;
+    }
+
+    .sidebar nav a:hover {
+      background-color: #f3f4f6;
+    }
+
+    .sidebar nav a img {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Header */
+    header {
+      background-color: #ffffff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header .toggle-sidebar {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    header .toggle-sidebar img {
+      width: 24px;
+      height: 24px;
+    }
+
+    header h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    header .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header .user-info span {
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    header .user-info button {
+      background: none;
+      border: none;
+      color: #6b46c1;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    header .user-info button:hover {
+      text-decoration: underline;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      transition: margin-left 0.3s ease-in-out;
+    }
+
+    /* Summary Cards */
+    .summary-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      margin-top: 20px;
+    }
+
+    .summary-card {
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .summary-card img {
+      width: 32px;
+      height: 32px;
+    }
+
+    .summary-card .text {
+      flex: 1;
+    }
+
+    .summary-card p:first-child {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .summary-card p:last-child {
+      color: #1f2937;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    /* Quizzes Table */
+    .quizzes-table {
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .quizzes-table .header {
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .quizzes-table .header h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .quizzes-table .header .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .quizzes-table .header input {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      width: 250px;
+    }
+
+    .quizzes-table .header button {
+      background-color: #6b46c1;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .quizzes-table .header button:hover {
+      background-color: #5b35a6;
+    }
+
+    .quizzes-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .quizzes-table th, .quizzes-table td {
+      padding: 15px 20px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .quizzes-table th {
+      background-color: #f9fafb;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .quizzes-table td {
+      color: #4b5563;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .quizzes-table tr:hover {
+      background-color: #f9fafb;
+    }
+
+    .quizzes-table td span.created {
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    .quizzes-table .difficulty, .quizzes-table .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 9999px;
+      font-size: 12px;
+    }
+
+    .difficulty-easy { background-color: #d1fae5; color: #10b981; }
+    .difficulty-medium { background-color: #fef3c7; color: #f59e0b; }
+    .difficulty-hard { background-color: #fee2e2; color: #ef4444; }
+    .status-published { background-color: #d1fae5; color: #10b981; }
+    .status-draft { background-color: #fef3c7; color: #f59e0b; }
+
+    .quizzes-table .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .quizzes-table .actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .quizzes-table .actions img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .quizzes-table .actions button:hover img {
+      filter: brightness(0.8);
+    }
+
+    .quizzes-table .actions .delete:hover img {
+      filter: brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(5);
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal .modal-content {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .modal h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 20px;
+    }
+
+    .modal form .form-group {
+      margin-bottom: 15px;
+    }
+
+    .modal form label {
+      display: block;
+      font-size: 14px;
+      color: #4b5563;
+      margin-bottom: 5px;
+    }
+
+    .modal form input,
+    .modal form select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    .modal form .buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal form button {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .modal form .create-btn {
+      background-color: #6b46c1;
+      color: #ffffff;
+    }
+
+    .modal form .create-btn:hover {
+      background-color: #5b35a6;
+    }
+
+    .modal form .cancel-btn {
+      background-color: #e5e7eb;
+      color: #4b5563;
+    }
+
+    .modal form .cancel-btn:hover {
+      background-color: #d1d5db;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        left: -250px;
+      }
+
+      .sidebar-hidden {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      header .toggle-sidebar {
+        display: block;
+      }
+
+      .quizzes-table {
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <div class="logo">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236b46c1'%3E%3Cpath d='M12 2a10 10 0 00-7.35 16.76l.15.14 1.43-1.43a8 8 0 1111.64 0l1.43 1.43.15-.14A10 10 0 0012 2zM9 12a3 3 0 106 0 3 3 0 00-6 0z'/%3E%3C/svg%3E" alt="Logo">
+      <h1>QuizPlatform</h1>
+    </div>
+    <nav>
+      <a href="#" class="active">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 12h18M3 6h18M3 18h18'/%3E%3C/svg%3E" alt="Dashboard">
+        <span>Dashboard</span>
+      </a>
+      <a href="/admin/manageQuiz">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'/%3E%3C/svg%3E" alt="Quizzes">
+        <span>Manage Quizzes</span>
+      </a>
+      <a href="/admin/submissions">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'/%3E%3C/svg%3E" alt="Submissions">
+        <span>Submissions</span>
+      </a>
+      <a href="/admin/leaderboard">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13 10V3L4 14h7v7l9-11h-7z'/%3E%3C/svg%3E" alt="Leaderboard">
+        <span>Leaderboard</span>
+      </a>
+      <a href="/admin/profile">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'/%3E%3C/svg%3E" alt="Profile">
+        <span>Profile</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <header>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button id="toggleSidebar" class="toggle-sidebar">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234b5563'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/%3E%3C/svg%3E" alt="Menu">
+        </button>
+        <h2>Quiz Management</h2>
+      </div>
+      <div class="user-info">
+        <span id="usernameDisplay"></span>
+        <button onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="text">
+          <p>Total Quizzes</p>
+          <p id="totalQuizzes">0</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'/%3E%3C/svg%3E" alt="Published">
+        <div class="text">
+          <p>Published</p>
+          <p id="publishedQuizzes">0</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23eab308'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'/%3E%3C/svg%3E" alt="Drafts">
+        <div class="text">
+          <p>Drafts</p>
+          <p id="draftQuizzes">0</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b46c1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'/%3E%3C/svg%3E" alt="Participants">
+        <div class="text">
+          <p>Total Participants</p>
+          <p id="totalParticipants">0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quizzes Table -->
+    <div class="quizzes-table">
+      <div class="header">
+        <h3>All Quizzes</h3>
+        <div class="actions">
+          <input id="searchInput" type="text" placeholder="Search quizzes by title or category...">
+          
+          <button onclick="openCreateModal()">Create New Quiz</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Quiz Title</th>
+            <th>Category</th>
+            <th>Difficulty</th>
+            <th>Questions</th>
+            <th>Duration</th>
+            <th>Participants</th>
+            <th>Avg Score</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="quizTableBody">
+          <!-- Quiz rows will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+ 
+
+  <script>
+    // Global variables
+    var quizzes = [];
+    var allQuizzes = []; // Keep original data for search
+
+    // Function to decode JWT token and return payload
+    function decodeToken(token) {
+      try {
+        // Decode the token (Base64 URL decoding)
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (error) {
+        return null;
+      }
+    }
+
+    // Function to check if token is expired
+    function isTokenExpired(token) {
+      var decoded = decodeToken(token);
+      if (!decoded) return true;
+      var expiry = decoded.exp * 1000; // Convert to milliseconds
+      var now = new Date().getTime();
+      return now > expiry;
+    }
+
+    // Display username from token
+    function displayUsername() {
+      var token = localStorage.getItem('token');
+      var decoded = decodeToken(token);
+      if (decoded && decoded.username) {
+        document.getElementById('usernameDisplay').innerText = decoded.username + ' (admin)';
+      } else {
+        document.getElementById('usernameDisplay').innerText = 'Admin User (admin)';
+      }
+    }
+
+    // Check token before fetching quizzes
+    function checkAuth() {
+      var token = localStorage.getItem('token');
+      if (!token) {
+        alert('No authentication token found. Please login.');
+        window.location.href = '/';
+        return false;
+      }
+      if (isTokenExpired(token)) {
+        alert('Your session has expired. Please login again.');
+        localStorage.removeItem('token');
+        window.location.href = '/';
+        return false;
+      }
+      return true;
+    }
+
+    // Fetch quizzes from database
+    async function fetchQuizzes() {
+      if (!checkAuth()) return;
+
+      try {
+        const response = await fetch('/api/quizzes', {
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch quizzes');
+        }
+
+        const result = await response.json();
+        if (result.success) {
+          quizzes = result.data;
+          allQuizzes = [...result.data]; // Keep a copy for search
+          updateDashboard();
+        } else {
+          console.error('Failed to fetch quizzes:', result.message);
+        }
+      } catch (error) {
+        console.error('Error fetching quizzes:', error);
+        document.getElementById('quizTableBody').innerHTML = '<tr><td colspan="9" style="text-align: center; color: #ef4444;">Failed to load quizzes. Please try again.</td></tr>';
+      }
+    }
+
+    // Update dashboard stats and table
+    function updateDashboard() {
+      var totalQuizzes = quizzes.length;
+      var publishedQuizzes = 0;
+      var draftQuizzes = 0;
+      var totalParticipants = 0;
+
+      for (var i = 0; i < quizzes.length; i++) {
+        if (quizzes[i].status === 'Published') {
+          publishedQuizzes++;
+        } else if (quizzes[i].status === 'Draft') {
+          draftQuizzes++;
+        }
+        totalParticipants += (quizzes[i].participants || 0);
+      }
+
+      document.getElementById('totalQuizzes').textContent = totalQuizzes;
+      document.getElementById('publishedQuizzes').textContent = publishedQuizzes;
+      document.getElementById('draftQuizzes').textContent = draftQuizzes;
+      document.getElementById('totalParticipants').textContent = totalParticipants;
+
+      var tableBody = document.getElementById('quizTableBody');
+      tableBody.innerHTML = '';
+      
+      if (quizzes.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #6b7280;">No quizzes found.</td></tr>';
+        return;
+      }
+
+      for (var i = 0; i < quizzes.length; i++) {
+        var quiz = quizzes[i];
+        var row = document.createElement('tr');
+        row.innerHTML = 
+          '<td>' + quiz.title + '<br><span class="created">Created: ' + quiz.created + '</span></td>' +
+          '<td>' + quiz.category + '</td>' +
+          '<td><span class="difficulty difficulty-' + quiz.difficulty.toLowerCase() + '">' + quiz.difficulty + '</span></td>' +
+          '<td>' + quiz.questions + '</td>' +
+          '<td>' + quiz.duration + 'm</td>' +
+          '<td>' + quiz.participants + '</td>' +
+          '<td>' + quiz.avgScore + '%</td>' +
+          '<td><span class="status status-' + quiz.status.toLowerCase() + '">' + quiz.status + '</span></td>' +
+          '<td class="actions">' +
+            '<button onclick="viewQuiz(\'' + quiz.id + '\')">' +
+              '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%236b7280\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M15 12a3 3 0 11-6 0 3 3 0 016 0z\'/%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z\'/%3E%3C/svg%3E" alt="View">' +
+            '</button>' +
+            '<button onclick="editQuiz(\'' + quiz.id + '\')">' +
+              '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%236b7280\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z\'/%3E%3C/svg%3E" alt="Edit">' +
+            '</button>' +
+            '<button class="delete" onclick="deleteQuiz(\'' + quiz.id + '\')">' +
+              '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%236b7280\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a2 2 0 00-2 2h8a2 2 0 00-2-2m-4 0h4m-5 4v12m5-12v12\'/%3E%3C/svg%3E" alt="Delete">' +
+            '</button>' +
+          '</td>';
+        tableBody.appendChild(row);
+      }
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').oninput = function(e) {
+      var searchTerm = e.target.value.toLowerCase();
+      
+      if (searchTerm === '') {
+        // If search is empty, show all quizzes
+        quizzes = [...allQuizzes];
+      } else {
+        // Filter quizzes based on search term
+        quizzes = allQuizzes.filter(function(quiz) {
+          return quiz.title.toLowerCase().indexOf(searchTerm) !== -1 ||
+                 quiz.category.toLowerCase().indexOf(searchTerm) !== -1;
+        });
+      }
+      
+      updateDashboard();
+    };
+
+    // Quiz action functions
+    function viewQuiz(quizId) {
+      // Navigate to quiz view page
+      window.location.href = '/admin/manageQuiz?quizId=' + quizId;
+    }
+
+    function editQuiz(quizId) {
+      // Navigate to quiz edit page
+      window.location.href = '/admin/manageQuiz?quizId=' + quizId + '&edit=true';
+    }
+
+    async function deleteQuiz(quizId) {
+      if (!confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) {
+        return;
+      }
+
+      if (!checkAuth()) return;
+
+      try {
+        const response = await fetch('/api/quizzes/' + quizId, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          }
+        });
+
+        if (response.ok) {
+          // Refresh the quiz list
+          fetchQuizzes();
+        } else {
+          alert('Failed to delete quiz');
+        }
+      } catch (error) {
+        console.error('Error deleting quiz:', error);
+        alert('Error deleting quiz');
+      }
+    }
+
+    // Modal functions
+    function openCreateModal() {
+      // Navigate to create quiz page
+      window.location.href = '/admin/manageQuiz?create=true';
+    }
+
+    // Create sample data for testing
+    async function createSampleData() {
+      if (!checkAuth()) return;
+
+      try {
+        const response = await fetch('/api/quizzes/create-sample-data', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          }
+        });
+
+        if (response.ok) {
+          alert('Sample data created successfully!');
+          fetchQuizzes(); // Refresh the quiz list
+        } else {
+          alert('Failed to create sample data');
+        }
+      } catch (error) {
+        console.error('Error creating sample data:', error);
+        alert('Error creating sample data');
+      }
+    }
+
+    // Logout
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/';
+    }
+
+    // Sidebar toggle
+    document.getElementById('toggleSidebar').onclick = function() {
+      document.getElementById('sidebar').classList.toggle('sidebar-hidden');
+    };
+
+    // Initial setup: display username and fetch quizzes
+    displayUsername();
+    fetchQuizzes();
+  </script>
+</body>
+</html>
