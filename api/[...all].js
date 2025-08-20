@@ -1,7 +1,7 @@
 const app = require('../app');
 
-export default function handler(req, res) {
+module.exports = (req, res) => {
 	return app(req, res);
-}
+};
 
 
