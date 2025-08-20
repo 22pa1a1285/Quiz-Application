@@ -33,6 +33,11 @@ app.post('/api/logout', (req, res) => {
   res.json({ message: 'Logged out successfully' });
 });
 
+// Health check for deployment verification
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, env: process.env.VERCEL ? 'vercel' : 'local' });
+});
+
 // Mount quiz routes
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/admin', adminRoutes);
